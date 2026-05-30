@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurants - Foodie</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-brand">
+                🍔 Foodie
+            </a>
+            <ul class="navbar-nav">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="restaurants.html">Restaurants</a></li>
+                <li><a href="orders.html">Orders</a></li>
+                <li><a href="profile.html">Profile</a></li>
+                <li><a href="#" onclick="logout()">Logout</a></li>
+            </ul>
+            <div class="navbar-actions">
+                <a href="cart.html" class="cart-icon">
+                    🛒
+                    <span class="cart-badge" style="display: none;">0</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Search Section -->
+    <section class="section" style="background: var(--bg-light);">
+        <div class="section-container">
+            <h2 class="section-title">Find Restaurants</h2>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="Search restaurants..." 
+                    style="flex: 1; min-width: 200px; padding: 1rem; border: 2px solid var(--border-color); border-radius: var(--radius-sm);"
+                >
+                <select id="categoryFilter" style="padding: 1rem; border: 2px solid var(--border-color); border-radius: var(--radius-sm);">
+                    <option value="">All Categories</option>
+                </select>
+                <select id="ratingFilter" style="padding: 1rem; border: 2px solid var(--border-color); border-radius: var(--radius-sm);">
+                    <option value="">All Ratings</option>
+                    <option value="4">4+ Stars</option>
+                    <option value="3">3+ Stars</option>
+                    <option value="2">2+ Stars</option>
+                </select>
+                <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+            </div>
+            
+            <div class="restaurants-grid" id="restaurantsGrid">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>Foodie</h4>
+                <p style="color: var(--text-lighter);">Food Delivered Faster</p>
+            </div>
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">FAQs</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Foodie. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script>
+        // Initialize navbar
+        initializeNavbar();
+
+        // Load categories for filter
+        async function loadCategories() {
+            try {
+                const categories = await categoryAPI.getCategories();
+                const select = document.getElementById('categoryFilter');
+                
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id;
+                    option.textContent = category.name;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        // Load restaurants
+        async function loadRestaurants(params = {}) {
+            try {
+                const restaurants = await restaurantAPI.getRestaurants(params);
+                const grid = document.getElementById('restaurantsGrid');
+                
+                if (restaurants.length === 0) {
+                    grid.innerHTML = '<p style="text-align: center; color: var(--text-light); grid-column: 1/-1;">No restaurants found</p>';
+                    return;
+                }
+                
+                grid.innerHTML = restaurants.map(restaurant => `
+                    <div class="restaurant-card" onclick="viewRestaurant(${restaurant.id})">
+                        <img src="${restaurant.image_url || 'https://via.placeholder.com/400x200'}" alt="${restaurant.name}">
+                        <div class="restaurant-card-content">
+                            <h3>${restaurant.name}</h3>
+                            <p>${restaurant.description || 'Delicious food'}</p>
+                            <div class="restaurant-rating">
+                                <span class="rating-badge">${restaurant.rating.toFixed(1)} ★</span>
+                                <span>${restaurant.delivery_time || '30-40 mins'}</span>
+                            </div>
+                            <div class="restaurant-meta">
+                                <span>${restaurant.cuisine_type || 'Multi-cuisine'}</span>
+                                <span>${formatPrice(restaurant.delivery_fee)} delivery</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading restaurants:', error);
+                document.getElementById('restaurantsGrid').innerHTML = '<p style="text-align: center; color: var(--text-light);">Failed to load restaurants</p>';
+            }
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value;
+            const categoryId = document.getElementById('categoryFilter').value;
+            const minRating = document.getElementById('ratingFilter').value;
+            
+            const params = {};
+            if (search) params.search = search;
+            if (categoryId) params.category_id = categoryId;
+            if (minRating) params.min_rating = minRating;
+            
+            loadRestaurants(params);
+        }
+
+        // View restaurant
+        function viewRestaurant(id) {
+            window.location.href = `menu.html?restaurant_id=${id}`;
+        }
+
+        // Get URL parameters
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                search: params.get('search'),
+                category_id: params.get('category_id'),
+                min_rating: params.get('min_rating')
+            };
+        }
+
+        // Initialize
+        loadCategories();
+        
+        // Check for URL parameters
+        const urlParams = getUrlParams();
+        if (urlParams.search) {
+            document.getElementById('searchInput').value = urlParams.search;
+        }
+        if (urlParams.category_id) {
+            document.getElementById('categoryFilter').value = urlParams.category_id;
+        }
+        
+        loadRestaurants(urlParams);
+
+        // Search on Enter key
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                applyFilters();
+            }
+        });
+    </script>
+</body>
+</html>

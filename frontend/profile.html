@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Foodie</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-brand">
+                🍔 Foodie
+            </a>
+            <ul class="navbar-nav">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="restaurants.html">Restaurants</a></li>
+                <li><a href="orders.html">Orders</a></li>
+                <li><a href="profile.html">Profile</a></li>
+                <li><a href="#" onclick="logout()">Logout</a></li>
+            </ul>
+            <div class="navbar-actions">
+                <a href="cart.html" class="cart-icon">
+                    🛒
+                    <span class="cart-badge" style="display: none;">0</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Profile Section -->
+    <section class="section">
+        <div class="section-container">
+            <h2 class="section-title">My Profile</h2>
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
+                <!-- User Info Card -->
+                <div style="background: white; padding: 2rem; border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                        <div style="width: 100px; height: 100px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 3rem; color: white;">
+                            👤
+                        </div>
+                        <h3 id="userName" style="color: var(--text-dark); margin-bottom: 0.5rem;">Loading...</h3>
+                        <p id="userEmail" style="color: var(--text-light);">Loading...</p>
+                    </div>
+                    
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+                        <div style="margin-bottom: 1rem;">
+                            <strong style="color: var(--text-dark);">Username:</strong>
+                            <span id="userUsername" style="color: var(--text-light); margin-left: 0.5rem;">Loading...</span>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <strong style="color: var(--text-dark);">Phone:</strong>
+                            <span id="userPhone" style="color: var(--text-light); margin-left: 0.5rem;">Loading...</span>
+                        </div>
+                        <div>
+                            <strong style="color: var(--text-dark);">Role:</strong>
+                            <span id="userRole" style="color: var(--text-light); margin-left: 0.5rem;">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit Profile Form -->
+                <div style="background: white; padding: 2rem; border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
+                    <h3 style="margin-bottom: 1.5rem; color: var(--text-dark);">Edit Profile</h3>
+                    <form id="editProfileForm">
+                        <div class="form-group">
+                            <label for="full_name">Full Name</label>
+                            <input type="text" id="full_name" name="full_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Profile</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Saved Addresses -->
+            <div style="margin-top: 3rem;">
+                <h3 style="margin-bottom: 1.5rem; color: var(--text-dark);">Saved Addresses</h3>
+                <div id="addressList" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>Foodie</h4>
+                <p style="color: var(--text-lighter);">Food Delivered Faster</p>
+            </div>
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">FAQs</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Foodie. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script>
+        // Initialize navbar
+        initializeNavbar();
+
+        // Load user profile
+        async function loadUserProfile() {
+            try {
+                const user = await userAPI.getCurrentUser();
+                
+                document.getElementById('userName').textContent = user.full_name;
+                document.getElementById('userEmail').textContent = user.email;
+                document.getElementById('userUsername').textContent = user.username;
+                document.getElementById('userPhone').textContent = user.phone || 'Not provided';
+                document.getElementById('userRole').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+                
+                // Pre-fill form
+                document.getElementById('full_name').value = user.full_name;
+                document.getElementById('phone').value = user.phone || '';
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                showToast('Failed to load profile', 'error');
+            }
+        }
+
+        // Update profile
+        document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const userData = {
+                full_name: formData.get('full_name'),
+                phone: formData.get('phone')
+            };
+            
+            try {
+                await userAPI.updateUser(userData);
+                showToast('Profile updated successfully!', 'success');
+                loadUserProfile();
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                showToast('Failed to update profile', 'error');
+            }
+        });
+
+        // Load addresses
+        async function loadAddresses() {
+            try {
+                const addresses = await addressAPI.getAddresses();
+                const container = document.getElementById('addressList');
+                
+                if (addresses.length === 0) {
+                    container.innerHTML = '<p style="color: var(--text-light); grid-column: 1/-1;">No addresses saved</p>';
+                    return;
+                }
+                
+                container.innerHTML = addresses.map(address => `
+                    <div style="background: white; padding: 1.5rem; border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                            <strong style="color: var(--text-dark);">${address.full_name}</strong>
+                            ${address.is_default ? '<span style="background: var(--primary-color); color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">Default</span>' : ''}
+                        </div>
+                        <p style="color: var(--text-light); margin-bottom: 0.25rem;">${address.phone}</p>
+                        <p style="color: var(--text-light); margin-bottom: 0.25rem;">${address.address_line1}</p>
+                        ${address.address_line2 ? `<p style="color: var(--text-light); margin-bottom: 0.25rem;">${address.address_line2}</p>` : ''}
+                        <p style="color: var(--text-light);">${address.city}, ${address.state} - ${address.postal_code}</p>
+                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                            <button class="btn btn-outline btn-sm" onclick="deleteAddress(${address.id})">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading addresses:', error);
+                document.getElementById('addressList').innerHTML = '<p style="color: var(--text-light); grid-column: 1/-1;">Failed to load addresses</p>';
+            }
+        }
+
+        // Delete address
+        async function deleteAddress(id) {
+            if (!confirm('Are you sure you want to delete this address?')) {
+                return;
+            }
+            
+            try {
+                await addressAPI.deleteAddress(id);
+                showToast('Address deleted successfully', 'success');
+                loadAddresses();
+            } catch (error) {
+                console.error('Error deleting address:', error);
+                showToast('Failed to delete address', 'error');
+            }
+        }
+
+        // Initialize
+        loadUserProfile();
+        loadAddresses();
+    </script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foodie - Food Delivered Faster</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-brand">
+                🍔 Foodie
+            </a>
+            <ul class="navbar-nav">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="restaurants.html">Restaurants</a></li>
+                <li><a href="orders.html">Orders</a></li>
+                <li><a href="profile.html">Profile</a></li>
+                <li><a href="#" onclick="logout()">Logout</a></li>
+            </ul>
+            <div class="navbar-actions">
+                <a href="cart.html" class="cart-icon">
+                    🛒
+                    <span class="cart-badge" style="display: none;">0</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <h1>Food Delivered <span>Faster</span></h1>
+            <p>Order from your favorite restaurants and get it delivered to your doorstep</p>
+            <div class="hero-search">
+                <input type="text" id="searchInput" placeholder="Search for restaurants or food items...">
+                <button class="btn btn-primary" onclick="search()">Search</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="section">
+        <div class="section-container">
+            <h2 class="section-title">What's on your mind?</h2>
+            <div class="categories-grid" id="categoriesGrid">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Popular Restaurants Section -->
+    <section class="section" style="background: var(--bg-light);">
+        <div class="section-container">
+            <h2 class="section-title">Popular Restaurants</h2>
+            <div class="restaurants-grid" id="restaurantsGrid">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Foods Section -->
+    <section class="section">
+        <div class="section-container">
+            <h2 class="section-title">Featured Foods</h2>
+            <div class="foods-grid" id="foodsGrid">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Offers Section -->
+    <section class="section" style="background: linear-gradient(135deg, #FFF5EB 0%, #FFE4D6 100%);">
+        <div class="section-container">
+            <h2 class="section-title">Today's Offers</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                <div class="glass" style="padding: 2rem; border-radius: var(--radius-md); text-align: center;">
+                    <h3 style="color: var(--primary-color); font-size: 1.5rem; margin-bottom: 0.5rem;">50% OFF</h3>
+                    <p style="color: var(--text-light);">On your first order</p>
+                    <p style="color: var(--text-lighter); font-size: 0.875rem; margin-top: 0.5rem;">Use code: FIRST50</p>
+                </div>
+                <div class="glass" style="padding: 2rem; border-radius: var(--radius-md); text-align: center;">
+                    <h3 style="color: var(--primary-color); font-size: 1.5rem; margin-bottom: 0.5rem;">FREE DELIVERY</h3>
+                    <p style="color: var(--text-light);">On orders above ₹500</p>
+                    <p style="color: var(--text-lighter); font-size: 0.875rem; margin-top: 0.5rem;">Auto-applied at checkout</p>
+                </div>
+                <div class="glass" style="padding: 2rem; border-radius: var(--radius-md); text-align: center;">
+                    <h3 style="color: var(--primary-color); font-size: 1.5rem; margin-bottom: 0.5rem;">₹100 OFF</h3>
+                    <p style="color: var(--text-light);">On orders above ₹300</p>
+                    <p style="color: var(--text-lighter); font-size: 0.875rem; margin-top: 0.5rem;">Use code: SAVE100</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>Foodie</h4>
+                <p style="color: var(--text-lighter);">Food Delivered Faster</p>
+            </div>
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">FAQs</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Foodie. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script>
+        // Initialize navbar
+        initializeNavbar();
+
+        // Load categories
+        async function loadCategories() {
+            try {
+                const categories = await categoryAPI.getCategories();
+                const grid = document.getElementById('categoriesGrid');
+                
+                grid.innerHTML = categories.map(category => `
+                    <div class="category-card" onclick="filterByCategory(${category.id})">
+                        <img src="${category.image_url || 'https://via.placeholder.com/80'}" alt="${category.name}">
+                        <h3>${category.name}</h3>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                document.getElementById('categoriesGrid').innerHTML = '<p style="text-align: center; color: var(--text-light);">Failed to load categories</p>';
+            }
+        }
+
+        // Load restaurants
+        async function loadRestaurants() {
+            try {
+                const restaurants = await restaurantAPI.getRestaurants({ limit: 8 });
+                const grid = document.getElementById('restaurantsGrid');
+                
+                grid.innerHTML = restaurants.map(restaurant => `
+                    <div class="restaurant-card" onclick="viewRestaurant(${restaurant.id})">
+                        <img src="${restaurant.image_url || 'https://via.placeholder.com/400x200'}" alt="${restaurant.name}">
+                        <div class="restaurant-card-content">
+                            <h3>${restaurant.name}</h3>
+                            <p>${restaurant.description || 'Delicious food'}</p>
+                            <div class="restaurant-rating">
+                                <span class="rating-badge">${restaurant.rating.toFixed(1)} ★</span>
+                                <span>${restaurant.delivery_time || '30-40 mins'}</span>
+                            </div>
+                            <div class="restaurant-meta">
+                                <span>${restaurant.cuisine_type || 'Multi-cuisine'}</span>
+                                <span>${formatPrice(restaurant.delivery_fee)} delivery</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading restaurants:', error);
+                document.getElementById('restaurantsGrid').innerHTML = '<p style="text-align: center; color: var(--text-light);">Failed to load restaurants</p>';
+            }
+        }
+
+        // Load featured foods
+        async function loadFoods() {
+            try {
+                const foods = await foodAPI.getFoods({ limit: 8 });
+                const grid = document.getElementById('foodsGrid');
+                
+                grid.innerHTML = foods.map(food => `
+                    <div class="food-card" onclick="viewFood(${food.id})">
+                        <img src="${food.image_url || 'https://via.placeholder.com/250x180'}" alt="${food.name}">
+                        ${food.is_vegetarian ? '<div class="veg-icon"></div>' : '<div class="non-veg-icon"></div>'}
+                        <div class="food-card-content">
+                            <h3>${food.name}</h3>
+                            <p>${food.description || 'Delicious food item'}</p>
+                            <div class="food-price">${formatPrice(food.price)}</div>
+                        </div>
+                        <button class="add-btn" onclick="event.stopPropagation(); addToCart(${food.id})">ADD</button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading foods:', error);
+                document.getElementById('foodsGrid').innerHTML = '<p style="text-align: center; color: var(--text-light);">Failed to load foods</p>';
+            }
+        }
+
+        // Add to cart
+        async function addToCart(foodId) {
+            if (!isAuthenticated()) {
+                showToast('Please login to add items to cart', 'error');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const result = await cartAPI.addToCart(foodId);
+                console.log('Cart add result:', result);
+                showToast('Item added to cart!', 'success');
+                const currentCount = getCartCount();
+                setCartCount(currentCount + 1);
+            } catch (error) {
+                console.error('Cart add error:', error);
+                showToast('Failed to add item to cart: ' + error.message, 'error');
+            }
+        }
+
+        // View restaurant
+        function viewRestaurant(id) {
+            window.location.href = `menu.html?restaurant_id=${id}`;
+        }
+
+        // View food
+        function viewFood(id) {
+            window.location.href = `menu.html?food_id=${id}`;
+        }
+
+        // Filter by category
+        function filterByCategory(categoryId) {
+            window.location.href = `restaurants.html?category_id=${categoryId}`;
+        }
+
+        // Search
+        function search() {
+            const query = document.getElementById('searchInput').value;
+            if (query) {
+                window.location.href = `restaurants.html?search=${encodeURIComponent(query)}`;
+            }
+        }
+
+        // Load all data
+        loadCategories();
+        loadRestaurants();
+        loadFoods();
+
+        // Search on Enter key
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                search();
+            }
+        });
+    </script>
+</body>
+</html>

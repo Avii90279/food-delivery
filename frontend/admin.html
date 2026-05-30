@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Foodie</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-brand">
+                🍔 Foodie Admin
+            </a>
+            <ul class="navbar-nav">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="admin.html">Dashboard</a></li>
+                <li><a href="#" onclick="logout()">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Admin Dashboard -->
+    <section class="section">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1>Admin Dashboard</h1>
+                <button class="btn btn-primary" onclick="refreshData()">Refresh Data</button>
+            </div>
+
+            <!-- Statistics -->
+            <div class="admin-stats">
+                <div class="stat-card">
+                    <h3>Total Users</h3>
+                    <div class="stat-value" id="totalUsers">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Restaurants</h3>
+                    <div class="stat-value" id="totalRestaurants">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Foods</h3>
+                    <div class="stat-value" id="totalFoods">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Orders</h3>
+                    <div class="stat-value" id="totalOrders">0</div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="admin-tabs">
+                <button class="admin-tab active" onclick="showTab('restaurants')">Restaurants</button>
+                <button class="admin-tab" onclick="showTab('foods')">Foods</button>
+                <button class="admin-tab" onclick="showTab('categories')">Categories</button>
+                <button class="admin-tab" onclick="showTab('orders')">Orders</button>
+                <button class="admin-tab" onclick="showTab('users')">Users</button>
+                <button class="admin-tab" onclick="showTab('coupons')">Coupons</button>
+            </div>
+
+            <!-- Restaurants Tab -->
+            <div id="restaurants-tab" class="tab-content active">
+                <div class="admin-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h2>Restaurants</h2>
+                        <button class="btn btn-primary" onclick="showAddRestaurantModal()">+ Add Restaurant</button>
+                    </div>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Rating</th>
+                                <th>Delivery Fee</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="restaurantsTable">
+                            <tr><td colspan="6" style="text-align: center;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Foods Tab -->
+            <div id="foods-tab" class="tab-content">
+                <div class="admin-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h2>Foods</h2>
+                        <button class="btn btn-primary" onclick="showAddFoodModal()">+ Add Food</button>
+                    </div>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Restaurant</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="foodsTable">
+                            <tr><td colspan="6" style="text-align: center;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Categories Tab -->
+            <div id="categories-tab" class="tab-content">
+                <div class="admin-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h2>Categories</h2>
+                        <button class="btn btn-primary" onclick="showAddCategoryModal()">+ Add Category</button>
+                    </div>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoriesTable">
+                            <tr><td colspan="4" style="text-align: center;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Orders Tab -->
+            <div id="orders-tab" class="tab-content">
+                <div class="admin-section">
+                    <h2>Orders</h2>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTable">
+                            <tr><td colspan="6" style="text-align: center;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Users Tab -->
+            <div id="users-tab" class="tab-content">
+                <div class="admin-section">
+                    <h2>Users</h2>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTable">
+                            <tr><td colspan="5" style="text-align: center;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Coupons Tab -->
+            <div id="coupons-tab" class="tab-content">
+                <div class="admin-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h2>Coupons</h2>
+                        <button class="btn btn-primary" onclick="showAddCouponModal()">+ Add Coupon</button>
+                    </div>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Code</th>
+                                <th>Discount</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="couponsTable">
+                            <tr><td colspan="6" style="text-align: center;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Add Restaurant Modal -->
+    <div id="addRestaurantModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Restaurant</h3>
+                <button class="modal-close" onclick="closeModal('addRestaurantModal')">&times;</button>
+            </div>
+            <form id="addRestaurantForm">
+                <div class="form-group">
+                    <label for="restaurantName">Name</label>
+                    <input type="text" id="restaurantName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="restaurantDescription">Description</label>
+                    <textarea id="restaurantDescription" name="description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="restaurantAddress">Address</label>
+                    <input type="text" id="restaurantAddress" name="address" required>
+                </div>
+                <div class="form-group">
+                    <label for="restaurantPhone">Phone</label>
+                    <input type="tel" id="restaurantPhone" name="phone" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="restaurantDeliveryTime">Delivery Time</label>
+                        <input type="text" id="restaurantDeliveryTime" name="delivery_time" placeholder="30-40 mins">
+                    </div>
+                    <div class="form-group">
+                        <label for="restaurantDeliveryFee">Delivery Fee</label>
+                        <input type="number" id="restaurantDeliveryFee" name="delivery_fee" value="0" step="0.01">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Add Restaurant</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Food Modal -->
+    <div id="addFoodModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Food</h3>
+                <button class="modal-close" onclick="closeModal('addFoodModal')">&times;</button>
+            </div>
+            <form id="addFoodForm">
+                <div class="form-group">
+                    <label for="foodName">Name</label>
+                    <input type="text" id="foodName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="foodDescription">Description</label>
+                    <textarea id="foodDescription" name="description"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="foodPrice">Price</label>
+                        <input type="number" id="foodPrice" name="price" required step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="foodRestaurant">Restaurant</label>
+                        <select id="foodRestaurant" name="restaurant_id" required>
+                            <option value="">Select Restaurant</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="foodVegetarian" name="is_vegetarian">
+                            Vegetarian
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="foodAvailable" name="is_available" checked>
+                            Available
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Add Food</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Category Modal -->
+    <div id="addCategoryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Category</h3>
+                <button class="modal-close" onclick="closeModal('addCategoryModal')">&times;</button>
+            </div>
+            <form id="addCategoryForm">
+                <div class="form-group">
+                    <label for="categoryName">Name</label>
+                    <input type="text" id="categoryName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="categoryDescription">Description</label>
+                    <textarea id="categoryDescription" name="description"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Add Category</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Coupon Modal -->
+    <div id="addCouponModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Coupon</h3>
+                <button class="modal-close" onclick="closeModal('addCouponModal')">&times;</button>
+            </div>
+            <form id="addCouponForm">
+                <div class="form-group">
+                    <label for="couponCode">Code</label>
+                    <input type="text" id="couponCode" name="code" required>
+                </div>
+                <div class="form-group">
+                    <label for="couponDescription">Description</label>
+                    <input type="text" id="couponDescription" name="description">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="couponDiscountType">Discount Type</label>
+                        <select id="couponDiscountType" name="discount_type" required>
+                            <option value="percentage">Percentage</option>
+                            <option value="flat">Flat</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="couponDiscountValue">Discount Value</label>
+                        <input type="number" id="couponDiscountValue" name="discount_value" required step="0.01">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="couponMinOrder">Minimum Order Amount</label>
+                    <input type="number" id="couponMinOrder" name="min_order_amount" value="0" step="0.01">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Add Coupon</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        // Check admin access
+        const user = getCurrentUser();
+        if (!user || user.role !== 'admin') {
+            alert('Access denied. Admin privileges required.');
+            window.location.href = 'index.html';
+        }
+
+        // Initialize navbar
+        initializeNavbar();
+
+        // Tab switching
+        function showTab(tabName) {
+            document.querySelectorAll('.admin-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+
+        // Modal functions
+        function showAddRestaurantModal() {
+            document.getElementById('addRestaurantModal').classList.add('active');
+        }
+
+        function showAddFoodModal() {
+            loadRestaurantsForSelect();
+            document.getElementById('addFoodModal').classList.add('active');
+        }
+
+        function showAddCategoryModal() {
+            document.getElementById('addCategoryModal').classList.add('active');
+        }
+
+        function showAddCouponModal() {
+            document.getElementById('addCouponModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Load statistics
+        async function loadStatistics() {
+            try {
+                const users = await userAPI.getAllUsers();
+                const restaurants = await restaurantAPI.getRestaurants();
+                const foods = await foodAPI.getFoods();
+                const orders = await orderAPI.getOrders();
+                
+                document.getElementById('totalUsers').textContent = users.length;
+                document.getElementById('totalRestaurants').textContent = restaurants.length;
+                document.getElementById('totalFoods').textContent = foods.length;
+                document.getElementById('totalOrders').textContent = orders.length;
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+            }
+        }
+
+        // Load restaurants table
+        async function loadRestaurantsTable() {
+            try {
+                const restaurants = await restaurantAPI.getRestaurants();
+                const tbody = document.getElementById('restaurantsTable');
+                
+                tbody.innerHTML = restaurants.map(r => `
+                    <tr>
+                        <td>${r.id}</td>
+                        <td>${r.name}</td>
+                        <td>${r.rating.toFixed(1)}</td>
+                        <td>${formatPrice(r.delivery_fee)}</td>
+                        <td>${r.is_active ? '<span style="color: #24963f;">Active</span>' : '<span style="color: #d32f2f;">Inactive</span>'}</td>
+                        <td class="actions">
+                            <button class="btn btn-secondary btn-sm" onclick="deleteRestaurant(${r.id})">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading restaurants:', error);
+            }
+        }
+
+        // Load foods table
+        async function loadFoodsTable() {
+            try {
+                const foods = await foodAPI.getFoods();
+                const tbody = document.getElementById('foodsTable');
+                
+                tbody.innerHTML = foods.map(f => `
+                    <tr>
+                        <td>${f.id}</td>
+                        <td>${f.name}</td>
+                        <td>${formatPrice(f.price)}</td>
+                        <td>${f.restaurant_id}</td>
+                        <td>${f.is_available ? '<span style="color: #24963f;">Available</span>' : '<span style="color: #d32f2f;">Unavailable</span>'}</td>
+                        <td class="actions">
+                            <button class="btn btn-secondary btn-sm" onclick="deleteFood(${f.id})">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading foods:', error);
+            }
+        }
+
+        // Load categories table
+        async function loadCategoriesTable() {
+            try {
+                const categories = await categoryAPI.getCategories();
+                const tbody = document.getElementById('categoriesTable');
+                
+                tbody.innerHTML = categories.map(c => `
+                    <tr>
+                        <td>${c.id}</td>
+                        <td>${c.name}</td>
+                        <td>${c.description || '-'}</td>
+                        <td class="actions">
+                            <button class="btn btn-secondary btn-sm" onclick="deleteCategory(${c.id})">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        // Load orders table
+        async function loadOrdersTable() {
+            try {
+                const orders = await orderAPI.getOrders();
+                const tbody = document.getElementById('ordersTable');
+                
+                tbody.innerHTML = orders.map(o => `
+                    <tr>
+                        <td>${o.id}</td>
+                        <td>${o.user_id}</td>
+                        <td>${formatPrice(o.final_amount)}</td>
+                        <td><span class="order-status status-${o.status}">${o.status}</span></td>
+                        <td>${formatDate(o.created_at)}</td>
+                        <td class="actions">
+                            <select onchange="updateOrderStatus(${o.id}, this.value)" style="padding: 0.25rem;">
+                                <option value="">Update Status</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="preparing">Preparing</option>
+                                <option value="out_for_delivery">Out for Delivery</option>
+                                <option value="delivered">Delivered</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading orders:', error);
+            }
+        }
+
+        // Load users table
+        async function loadUsersTable() {
+            try {
+                const users = await userAPI.getAllUsers();
+                const tbody = document.getElementById('usersTable');
+                
+                tbody.innerHTML = users.map(u => `
+                    <tr>
+                        <td>${u.id}</td>
+                        <td>${u.username}</td>
+                        <td>${u.email}</td>
+                        <td>${u.role}</td>
+                        <td>${u.is_active ? '<span style="color: #24963f;">Active</span>' : '<span style="color: #d32f2f;">Inactive</span>'}</td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        // Load coupons table
+        async function loadCouponsTable() {
+            try {
+                const coupons = await couponAPI.getCoupons();
+                const tbody = document.getElementById('couponsTable');
+                
+                tbody.innerHTML = coupons.map(c => `
+                    <tr>
+                        <td>${c.id}</td>
+                        <td>${c.code}</td>
+                        <td>${c.discount_type === 'percentage' ? c.discount_value + '%' : formatPrice(c.discount_value)}</td>
+                        <td>${c.discount_type}</td>
+                        <td>${c.is_active ? '<span style="color: #24963f;">Active</span>' : '<span style="color: #d32f2f;">Inactive</span>'}</td>
+                        <td class="actions">
+                            <button class="btn btn-secondary btn-sm" onclick="deleteCoupon(${c.id})">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading coupons:', error);
+            }
+        }
+
+        // Load restaurants for select dropdown
+        async function loadRestaurantsForSelect() {
+            try {
+                const restaurants = await restaurantAPI.getRestaurants();
+                const select = document.getElementById('foodRestaurant');
+                
+                select.innerHTML = '<option value="">Select Restaurant</option>' + 
+                    restaurants.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+            } catch (error) {
+                console.error('Error loading restaurants:', error);
+            }
+        }
+
+        // Delete functions
+        async function deleteRestaurant(id) {
+            if (!confirm('Are you sure you want to delete this restaurant?')) return;
+            try {
+                await restaurantAPI.deleteRestaurant(id);
+                showToast('Restaurant deleted successfully', 'success');
+                loadRestaurantsTable();
+                loadStatistics();
+            } catch (error) {
+                showToast('Failed to delete restaurant', 'error');
+            }
+        }
+
+        async function deleteFood(id) {
+            if (!confirm('Are you sure you want to delete this food?')) return;
+            try {
+                await foodAPI.deleteFood(id);
+                showToast('Food deleted successfully', 'success');
+                loadFoodsTable();
+                loadStatistics();
+            } catch (error) {
+                showToast('Failed to delete food', 'error');
+            }
+        }
+
+        async function deleteCategory(id) {
+            if (!confirm('Are you sure you want to delete this category?')) return;
+            try {
+                await categoryAPI.deleteCategory(id);
+                showToast('Category deleted successfully', 'success');
+                loadCategoriesTable();
+            } catch (error) {
+                showToast('Failed to delete category', 'error');
+            }
+        }
+
+        async function deleteCoupon(id) {
+            if (!confirm('Are you sure you want to delete this coupon?')) return;
+            try {
+                await couponAPI.deleteCoupon(id);
+                showToast('Coupon deleted successfully', 'success');
+                loadCouponsTable();
+            } catch (error) {
+                showToast('Failed to delete coupon', 'error');
+            }
+        }
+
+        async function updateOrderStatus(id, status) {
+            if (!status) return;
+            try {
+                await orderAPI.updateOrderStatus(id, status);
+                showToast('Order status updated', 'success');
+                loadOrdersTable();
+            } catch (error) {
+                showToast('Failed to update order status', 'error');
+            }
+        }
+
+        // Form submissions
+        document.getElementById('addRestaurantForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = {
+                name: formData.get('name'),
+                description: formData.get('description'),
+                address: formData.get('address'),
+                phone: formData.get('phone'),
+                delivery_time: formData.get('delivery_time'),
+                delivery_fee: parseFloat(formData.get('delivery_fee'))
+            };
+            try {
+                await restaurantAPI.createRestaurant(data);
+                showToast('Restaurant added successfully', 'success');
+                closeModal('addRestaurantModal');
+                e.target.reset();
+                loadRestaurantsTable();
+                loadStatistics();
+            } catch (error) {
+                showToast('Failed to add restaurant', 'error');
+            }
+        });
+
+        document.getElementById('addFoodForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = {
+                name: formData.get('name'),
+                description: formData.get('description'),
+                price: parseFloat(formData.get('price')),
+                restaurant_id: parseInt(formData.get('restaurant_id')),
+                is_vegetarian: formData.get('is_vegetarian') === 'on',
+                is_available: formData.get('is_available') === 'on'
+            };
+            try {
+                await foodAPI.createFood(data);
+                showToast('Food added successfully', 'success');
+                closeModal('addFoodModal');
+                e.target.reset();
+                loadFoodsTable();
+                loadStatistics();
+            } catch (error) {
+                showToast('Failed to add food', 'error');
+            }
+        });
+
+        document.getElementById('addCategoryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = {
+                name: formData.get('name'),
+                description: formData.get('description')
+            };
+            try {
+                await categoryAPI.createCategory(data);
+                showToast('Category added successfully', 'success');
+                closeModal('addCategoryModal');
+                e.target.reset();
+                loadCategoriesTable();
+            } catch (error) {
+                showToast('Failed to add category', 'error');
+            }
+        });
+
+        document.getElementById('addCouponForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = {
+                code: formData.get('code'),
+                description: formData.get('description'),
+                discount_type: formData.get('discount_type'),
+                discount_value: parseFloat(formData.get('discount_value')),
+                min_order_amount: parseFloat(formData.get('min_order_amount'))
+            };
+            try {
+                await couponAPI.createCoupon(data);
+                showToast('Coupon added successfully', 'success');
+                closeModal('addCouponModal');
+                e.target.reset();
+                loadCouponsTable();
+            } catch (error) {
+                showToast('Failed to add coupon', 'error');
+            }
+        });
+
+        // Refresh all data
+        function refreshData() {
+            loadStatistics();
+            loadRestaurantsTable();
+            loadFoodsTable();
+            loadCategoriesTable();
+            loadOrdersTable();
+            loadUsersTable();
+            loadCouponsTable();
+        }
+
+        // Initialize
+        refreshData();
+    </script>
+</body>
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu - Foodie</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-brand">
+                🍔 Foodie
+            </a>
+            <ul class="navbar-nav">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="restaurants.html">Restaurants</a></li>
+                <li><a href="orders.html">Orders</a></li>
+                <li><a href="profile.html">Profile</a></li>
+                <li><a href="#" onclick="logout()">Logout</a></li>
+            </ul>
+            <div class="navbar-actions">
+                <a href="cart.html" class="cart-icon">
+                    🛒
+                    <span class="cart-badge" style="display: none;">0</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Restaurant Details Section -->
+    <section class="section" style="background: var(--bg-light);">
+        <div class="section-container" id="restaurantDetails">
+            <div class="loading">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section class="section">
+        <div class="section-container">
+            <h2 class="section-title">Menu</h2>
+            <div class="foods-grid" id="foodsGrid">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reviews Section -->
+    <section class="section" style="background: var(--bg-light);">
+        <div class="section-container">
+            <h2 class="section-title">Reviews</h2>
+            <div id="reviewsSection">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>Foodie</h4>
+                <p style="color: var(--text-lighter);">Food Delivered Faster</p>
+            </div>
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">FAQs</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Foodie. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script>
+        // Initialize navbar
+        initializeNavbar();
+
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const restaurantId = urlParams.get('restaurant_id');
+        const foodId = urlParams.get('food_id');
+
+        // Load restaurant details
+        async function loadRestaurantDetails(id) {
+            try {
+                const restaurant = await restaurantAPI.getRestaurant(id);
+                const container = document.getElementById('restaurantDetails');
+                
+                container.innerHTML = `
+                    <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+                        <img src="${restaurant.image_url || 'https://via.placeholder.com/400x300'}" 
+                             alt="${restaurant.name}" 
+                             style="width: 400px; height: 300px; object-fit: cover; border-radius: var(--radius-md);">
+                        <div style="flex: 1; min-width: 300px;">
+                            <h1 style="font-size: 2.5rem; font-weight: 700; color: var(--text-dark); margin-bottom: 1rem;">
+                                ${restaurant.name}
+                            </h1>
+                            <p style="color: var(--text-light); font-size: 1.125rem; margin-bottom: 1rem;">
+                                ${restaurant.description || 'Delicious food'}
+                            </p>
+                            <div style="display: flex; gap: 2rem; margin-bottom: 1rem;">
+                                <div>
+                                    <span style="font-weight: 700; color: var(--text-dark);">Rating:</span>
+                                    <span class="rating-badge" style="margin-left: 0.5rem;">${restaurant.rating.toFixed(1)} ★</span>
+                                </div>
+                                <div>
+                                    <span style="font-weight: 700; color: var(--text-dark);">Delivery Time:</span>
+                                    <span style="color: var(--text-light); margin-left: 0.5rem;">${restaurant.delivery_time || '30-40 mins'}</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 2rem;">
+                                <div>
+                                    <span style="font-weight: 700; color: var(--text-dark);">Address:</span>
+                                    <span style="color: var(--text-light); margin-left: 0.5rem;">${restaurant.address}</span>
+                                </div>
+                                <div>
+                                    <span style="font-weight: 700; color: var(--text-dark);">Phone:</span>
+                                    <span style="color: var(--text-light); margin-left: 0.5rem;">${restaurant.phone}</span>
+                                </div>
+                            </div>
+                            <div style="margin-top: 1rem;">
+                                <span style="font-weight: 700; color: var(--text-dark);">Delivery Fee:</span>
+                                <span style="color: var(--text-light); margin-left: 0.5rem;">${formatPrice(restaurant.delivery_fee)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                return restaurant;
+            } catch (error) {
+                console.error('Error loading restaurant:', error);
+                document.getElementById('restaurantDetails').innerHTML = '<p style="text-align: center; color: var(--text-light);">Failed to load restaurant details</p>';
+                return null;
+            }
+        }
+
+        // Load foods
+        async function loadFoods(restaurantId) {
+            try {
+                const foods = await foodAPI.getFoods({ restaurant_id: restaurantId });
+                const grid = document.getElementById('foodsGrid');
+                
+                if (foods.length === 0) {
+                    grid.innerHTML = '<p style="text-align: center; color: var(--text-light); grid-column: 1/-1;">No food items available</p>';
+                    return;
+                }
+                
+                grid.innerHTML = foods.map(food => `
+                    <div class="food-card" onclick="viewFood(${food.id})">
+                        <img src="${food.image_url || 'https://via.placeholder.com/250x180'}" alt="${food.name}">
+                        ${food.is_vegetarian ? '<div class="veg-icon"></div>' : '<div class="non-veg-icon"></div>'}
+                        <div class="food-card-content">
+                            <h3>${food.name}</h3>
+                            <p>${food.description || 'Delicious food item'}</p>
+                            <div class="food-price">${formatPrice(food.price)}</div>
+                        </div>
+                        <button class="add-btn" onclick="event.stopPropagation(); addToCart(${food.id})">ADD</button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading foods:', error);
+                document.getElementById('foodsGrid').innerHTML = '<p style="text-align: center; color: var(--text-light);">Failed to load foods</p>';
+            }
+        }
+
+        // Load reviews
+        async function loadReviews(restaurantId) {
+            try {
+                const reviews = await reviewAPI.getReviews({ restaurant_id: restaurantId });
+                const container = document.getElementById('reviewsSection');
+                
+                if (reviews.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: var(--text-light);">No reviews yet</p>';
+                    return;
+                }
+                
+                container.innerHTML = reviews.map(review => `
+                    <div style="background: white; padding: 1.5rem; border-radius: var(--radius-md); margin-bottom: 1rem; box-shadow: var(--shadow-sm);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <strong style="color: var(--text-dark);">${review.username}</strong>
+                            <span class="rating-badge">${review.rating} ★</span>
+                        </div>
+                        <p style="color: var(--text-light);">${review.comment || 'No comment'}</p>
+                        <p style="color: var(--text-lighter); font-size: 0.875rem; margin-top: 0.5rem;">${formatDate(review.created_at)}</p>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading reviews:', error);
+                document.getElementById('reviewsSection').innerHTML = '<p style="text-align: center; color: var(--text-light);">Failed to load reviews</p>';
+            }
+        }
+
+        // Add to cart
+        async function addToCart(foodId) {
+            if (!isAuthenticated()) {
+                showToast('Please login to add items to cart', 'error');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const result = await cartAPI.addToCart(foodId);
+                console.log('Cart add result:', result);
+                showToast('Item added to cart!', 'success');
+                const currentCount = getCartCount();
+                setCartCount(currentCount + 1);
+            } catch (error) {
+                console.error('Cart add error:', error);
+                showToast('Failed to add item to cart: ' + error.message, 'error');
+            }
+        }
+
+        // View food details
+        function viewFood(id) {
+            // Could implement a modal or navigate to a food detail page
+            console.log('View food:', id);
+        }
+
+        // Initialize
+        if (restaurantId) {
+            loadRestaurantDetails(restaurantId).then(restaurant => {
+                if (restaurant) {
+                    loadFoods(restaurantId);
+                    loadReviews(restaurantId);
+                }
+            });
+        } else if (foodId) {
+            // If only foodId is provided, load the food and its restaurant
+            foodAPI.getFood(foodId).then(food => {
+                loadRestaurantDetails(food.restaurant_id).then(restaurant => {
+                    if (restaurant) {
+                        loadFoods(food.restaurant_id);
+                        loadReviews(food.restaurant_id);
+                    }
+                });
+            }).catch(error => {
+                console.error('Error loading food:', error);
+            });
+        } else {
+            document.getElementById('restaurantDetails').innerHTML = '<p style="text-align: center; color: var(--text-light);">No restaurant specified</p>';
+            document.getElementById('foodsGrid').innerHTML = '';
+        }
+    </script>
+</body>
+</html>

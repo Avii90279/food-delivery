@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Foodie</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-brand">
+                🍔 Foodie
+            </a>
+            <ul class="navbar-nav">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="restaurants.html">Restaurants</a></li>
+                <li><a href="orders.html">Orders</a></li>
+                <li><a href="profile.html">Profile</a></li>
+                <li><a href="#" onclick="logout()">Logout</a></li>
+            </ul>
+            <div class="navbar-actions">
+                <a href="cart.html" class="cart-icon">
+                    🛒
+                    <span class="cart-badge" style="display: none;">0</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Checkout Section -->
+    <section class="section">
+        <div class="section-container">
+            <h2 class="section-title">Checkout</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <!-- Left Column - Form -->
+                <div>
+                    <!-- Address Selection -->
+                    <div style="background: white; padding: 2rem; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); margin-bottom: 2rem;">
+                        <h3 style="margin-bottom: 1.5rem; color: var(--text-dark);">Delivery Address</h3>
+                        <div id="addressList">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline" style="width: 100%; margin-top: 1rem;" onclick="showAddressForm()">
+                            + Add New Address
+                        </button>
+                    </div>
+
+                    <!-- Address Form (Hidden by default) -->
+                    <div id="addressForm" style="background: white; padding: 2rem; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); margin-bottom: 2rem; display: none;">
+                        <h3 style="margin-bottom: 1.5rem; color: var(--text-dark);">Add New Address</h3>
+                        <form id="newAddressForm">
+                            <div class="form-group">
+                                <label for="full_name">Full Name</label>
+                                <input type="text" id="full_name" name="full_name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone</label>
+                                <input type="tel" id="phone" name="phone" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="address_line1">Address Line 1</label>
+                                <input type="text" id="address_line1" name="address_line1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="address_line2">Address Line 2</label>
+                                <input type="text" id="address_line2" name="address_line2">
+                            </div>
+                            <div class="form-group">
+                                <label for="city">City</label>
+                                <input type="text" id="city" name="city" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="state">State</label>
+                                <input type="text" id="state" name="state" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="postal_code">Postal Code</label>
+                                <input type="text" id="postal_code" name="postal_code" required>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="is_default" name="is_default">
+                                    Set as default address
+                                </label>
+                            </div>
+                            <div style="display: flex; gap: 1rem;">
+                                <button type="submit" class="btn btn-primary" style="flex: 1;">Save Address</button>
+                                <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="hideAddressForm()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div style="background: white; padding: 2rem; border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
+                        <h3 style="margin-bottom: 1.5rem; color: var(--text-dark);">Payment Method</h3>
+                        <div class="form-group">
+                            <label>
+                                <input type="radio" name="payment_method" value="cod" checked>
+                                Cash on Delivery
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="radio" name="payment_method" value="card">
+                                Credit/Debit Card
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="radio" name="payment_method" value="upi">
+                                UPI
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Order Summary -->
+                <div>
+                    <div style="background: white; padding: 2rem; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); position: sticky; top: 100px;">
+                        <h3 style="margin-bottom: 1.5rem; color: var(--text-dark);">Order Summary</h3>
+                        <div id="orderSummary">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+
+                        <!-- Coupon Section -->
+                        <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                            <h4 style="margin-bottom: 1rem; color: var(--text-dark);">Apply Coupon</h4>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="text" id="couponCode" placeholder="Enter coupon code" style="flex: 1; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: var(--radius-sm);">
+                                <button class="btn btn-secondary" onclick="applyCoupon()">Apply</button>
+                            </div>
+                            <p id="couponMessage" style="margin-top: 0.5rem; font-size: 0.875rem;"></p>
+                        </div>
+
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 2rem; padding: 1.25rem;" onclick="placeOrder()">
+                            Place Order
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>Foodie</h4>
+                <p style="color: var(--text-lighter);">Food Delivered Faster</p>
+            </div>
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">FAQs</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Foodie. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script>
+        // Check authentication first
+        if (!requireAuth()) {
+            // Will redirect to login.html
+        }
+
+        // Initialize navbar
+        initializeNavbar();
+
+        let selectedAddressId = null;
+        let appliedCoupon = null;
+        let cartData = null;
+
+        // Load addresses
+        async function loadAddresses() {
+            try {
+                const addresses = await addressAPI.getAddresses();
+                const container = document.getElementById('addressList');
+                
+                if (addresses.length === 0) {
+                    container.innerHTML = '<p style="color: var(--text-light);">No addresses saved. Please add a delivery address.</p>';
+                    return;
+                }
+                
+                container.innerHTML = addresses.map(address => `
+                    <div style="padding: 1rem; border: 2px solid ${selectedAddressId === address.id ? 'var(--primary-color)' : 'var(--border-color)'}; border-radius: var(--radius-sm); margin-bottom: 1rem; cursor: pointer; transition: var(--transition);" onclick="selectAddress(${address.id})">
+                        <strong style="color: var(--text-dark);">${address.full_name}</strong>
+                        <p style="color: var(--text-light); margin-top: 0.25rem;">${address.phone}</p>
+                        <p style="color: var(--text-light);">${address.address_line1}, ${address.address_line2 || ''}</p>
+                        <p style="color: var(--text-light);">${address.city}, ${address.state} - ${address.postal_code}</p>
+                        ${address.is_default ? '<span style="background: var(--primary-color); color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">Default</span>' : ''}
+                    </div>
+                `).join('');
+                
+                // Select default address if none selected
+                if (!selectedAddressId) {
+                    const defaultAddress = addresses.find(a => a.is_default);
+                    if (defaultAddress) {
+                        selectAddress(defaultAddress.id);
+                    } else {
+                        selectAddress(addresses[0].id);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading addresses:', error);
+                document.getElementById('addressList').innerHTML = '<p style="color: var(--text-light);">Failed to load addresses</p>';
+            }
+        }
+
+        // Select address
+        function selectAddress(id) {
+            selectedAddressId = id;
+            loadAddresses();
+        }
+
+        // Show address form
+        function showAddressForm() {
+            document.getElementById('addressForm').style.display = 'block';
+        }
+
+        // Hide address form
+        function hideAddressForm() {
+            document.getElementById('addressForm').style.display = 'none';
+            document.getElementById('newAddressForm').reset();
+        }
+
+        // Add new address
+        document.getElementById('newAddressForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const addressData = {
+                full_name: formData.get('full_name'),
+                phone: formData.get('phone'),
+                address_line1: formData.get('address_line1'),
+                address_line2: formData.get('address_line2'),
+                city: formData.get('city'),
+                state: formData.get('state'),
+                postal_code: formData.get('postal_code'),
+                is_default: formData.get('is_default') === 'on'
+            };
+            
+            try {
+                await addressAPI.createAddress(addressData);
+                showToast('Address added successfully!', 'success');
+                hideAddressForm();
+                loadAddresses();
+            } catch (error) {
+                console.error('Error adding address:', error);
+                showToast('Failed to add address', 'error');
+            }
+        });
+
+        // Load order summary
+        async function loadOrderSummary() {
+            try {
+                const cart = await cartAPI.getCart();
+                cartData = cart;
+                const container = document.getElementById('orderSummary');
+                
+                if (cart.items.length === 0) {
+                    container.innerHTML = '<p style="color: var(--text-light);">Your cart is empty</p>';
+                    return;
+                }
+                
+                const deliveryFee = 40;
+                const gstRate = 0.05;
+                let discountAmount = 0;
+                
+                if (appliedCoupon) {
+                    if (appliedCoupon.discount_type === 'percentage') {
+                        discountAmount = cart.total_amount * (appliedCoupon.discount_value / 100);
+                    } else {
+                        discountAmount = appliedCoupon.discount_value;
+                    }
+                }
+                
+                const gstAmount = (cart.total_amount - discountAmount) * gstRate;
+                const finalAmount = cart.total_amount + deliveryFee + gstAmount - discountAmount;
+                
+                container.innerHTML = `
+                    <div style="margin-bottom: 1.5rem;">
+                        ${cart.items.map(item => `
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--text-light);">${item.food_name} x ${item.quantity}</span>
+                                <span style="color: var(--text-dark);">${formatPrice(item.food_price * item.quantity)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span>${formatPrice(cart.total_amount)}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Delivery Fee</span>
+                        <span>${formatPrice(deliveryFee)}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>GST (5%)</span>
+                        <span>${formatPrice(gstAmount)}</span>
+                    </div>
+                    ${discountAmount > 0 ? `
+                        <div class="summary-row">
+                            <span style="color: #24963f;">Discount</span>
+                            <span style="color: #24963f;">-${formatPrice(discountAmount)}</span>
+                        </div>
+                    ` : ''}
+                    <div class="summary-row">
+                        <span>Total</span>
+                        <span>${formatPrice(finalAmount)}</span>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading order summary:', error);
+                document.getElementById('orderSummary').innerHTML = '<p style="color: var(--text-light);">Failed to load order summary</p>';
+            }
+        }
+
+        // Apply coupon
+        async function applyCoupon() {
+            const code = document.getElementById('couponCode').value;
+            const message = document.getElementById('couponMessage');
+            
+            if (!code) {
+                message.textContent = 'Please enter a coupon code';
+                message.style.color = '#d32f2f';
+                return;
+            }
+            
+            try {
+                const result = await couponAPI.validateCoupon(code, cartData.total_amount);
+                appliedCoupon = result;
+                message.textContent = `Coupon applied! You saved ${formatPrice(result.discount)}`;
+                message.style.color = '#24963f';
+                loadOrderSummary();
+            } catch (error) {
+                console.error('Error applying coupon:', error);
+                appliedCoupon = null;
+                message.textContent = error.message || 'Invalid coupon code';
+                message.style.color = '#d32f2f';
+            }
+        }
+
+        // Place order
+        async function placeOrder() {
+            if (!selectedAddressId) {
+                showToast('Please select a delivery address', 'error');
+                return;
+            }
+            
+            if (!cartData || cartData.items.length === 0) {
+                showToast('Your cart is empty', 'error');
+                return;
+            }
+            
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+            
+            try {
+                await orderAPI.createOrder({
+                    address_id: selectedAddressId,
+                    payment_method: paymentMethod,
+                    coupon_code: appliedCoupon ? appliedCoupon.code : null
+                });
+                
+                showToast('Order placed successfully!', 'success');
+                setCartCount(0);
+                window.location.href = 'orders.html';
+            } catch (error) {
+                console.error('Error placing order:', error);
+                showToast('Failed to place order', 'error');
+            }
+        }
+
+        // Initialize
+        loadAddresses();
+        loadOrderSummary();
+    </script>
+</body>
+</html>
